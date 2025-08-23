@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://hub.fastgit.org/Josh-Fan/myCICDlab_caculator.git', branch: 'main'
+                git url: 'https://github.com/Josh-Fan/myCICDlab_caculator.git', branch: 'main'
             }
         }
 
