@@ -14,37 +14,46 @@ pipeline {
 
         stage('Setup Python Env') {
             steps {
-                sh 'python3 -m venv $VENV_DIR'
-                sh './$VENV_DIR/bin/pip install -r requirements.txt'
+                powershell '''
+                    python -m venv $env:VENV_DIR
+                    .\\$env:VENV_DIR\\Scripts\\Activate.ps1
+                    pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Static Analysis - SonarQube') {
             steps {
                 withSonarQubeEnv('SonarQubeServer') {
-                    sh './$VENV_DIR/bin/pip install sonar-scanner'
-                    sh 'sonar-scanner -Dsonar.projectKey=your_project -Dsonar.sources=. -Dsonar.python.version=3'
+                    powershell '''
+                        .\\$env:VENV_DIR\\Scripts\\Activate.ps1
+                        pip install sonar-scanner
+                        sonar-scanner -Dsonar.projectKey=your_project -Dsonar.sources=. -Dsonar.python.version=3
+                    '''
                 }
             }
         }
 
         stage('Security Scans') {
             steps {
-                sh './$VENV_DIR/bin/pip install bandit safety'
-                sh './$VENV_DIR/bin/bandit -r .'
-                sh './$VENV_DIR/bin/safety check'
+                powershell '''
+                    .\\$env:VENV_DIR\\Scripts\\Activate.ps1
+                    pip install bandit safety
+                    bandit -r .
+                    safety check
+                '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t yourapp:latest .'
+                powershell 'docker build -t yourapp:latest .'
             }
         }
 
         stage('Deploy with Docker') {
             steps {
-                sh 'docker run -d -p 8000:8000 yourapp:latest'
+                powershell 'docker run -d -p 8000:8000 yourapp:latest'
             }
         }
     }
