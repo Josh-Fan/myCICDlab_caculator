@@ -15,9 +15,15 @@ pipeline {
         stage('Setup Python Env') {
             steps {
                 powershell '''
-                    python -m venv $env:VENV_DIR
-                    .\\$env:VENV_DIR\\Scripts\\Activate.ps1
-                    pip install -r requirements.txt
+                    python -m venv "$env:VENV_DIR"
+                    $activateScript = Join-Path $env:VENV_DIR "Scripts\\Activate.ps1"
+                    if (Test-Path $activateScript) {
+                        & $activateScript
+                        pip install -r requirements.txt
+                    } else {
+                        Write-Error "Activation script not found at $activateScript"
+                        exit 1
+                    }
                 '''
             }
         }
@@ -26,9 +32,15 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQubeServer') {
                     powershell '''
-                        .\\$env:VENV_DIR\\Scripts\\Activate.ps1
-                        pip install sonar-scanner
-                        sonar-scanner -Dsonar.projectKey=your_project -Dsonar.sources=. -Dsonar.python.version=3
+                        $activateScript = Join-Path $env:VENV_DIR "Scripts\\Activate.ps1"
+                        if (Test-Path $activateScript) {
+                            & $activateScript
+                            pip install sonar-scanner
+                            sonar-scanner -Dsonar.projectKey=your_project -Dsonar.sources=. -Dsonar.python.version=3
+                        } else {
+                            Write-Error "Activation script not found at $activateScript"
+                            exit 1
+                        }
                     '''
                 }
             }
@@ -37,10 +49,16 @@ pipeline {
         stage('Security Scans') {
             steps {
                 powershell '''
-                    .\\$env:VENV_DIR\\Scripts\\Activate.ps1
-                    pip install bandit safety
-                    bandit -r .
-                    safety check
+                    $activateScript = Join-Path $env:VENV_DIR "Scripts\\Activate.ps1"
+                    if (Test-Path $activateScript) {
+                        & $activateScript
+                        pip install bandit safety
+                        bandit -r .
+                        safety check
+                    } else {
+                        Write-Error "Activation script not found at $activateScript"
+                        exit 1
+                    }
                 '''
             }
         }
