@@ -28,19 +28,14 @@ pipeline {
             }
         }
 
-        stage('Static Analysis - SonarQube') {
+        stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv('SonarQubeServer') {
                     powershell '''
-                        $activateScript = Join-Path $env:VENV_DIR "Scripts\\Activate.ps1"
-                        if (Test-Path $activateScript) {
-                            & $activateScript
-                            pip install sonar-scanner
-                            sonar-scanner -Dsonar.projectKey=your_project -Dsonar.sources=. -Dsonar.python.version=3
-                        } else {
-                            Write-Error "Activation script not found at $activateScript"
-                            exit 1
-                        }
+                    sonar-scanner `
+                    -Dsonar.projectKey="my1stscan" `
+                    -Dsonar.sources="." `
+                    -Dsonar.python.version="3.13"
                     '''
                 }
             }
