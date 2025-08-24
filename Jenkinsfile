@@ -33,9 +33,9 @@ pipeline {
                 withSonarQubeEnv('SonarQubeServer') {
                     powershell '''
                     sonar-scanner `
-                    -Dsonar.projectKey="my1stscan" `
-                    -Dsonar.sources="." `
-                    -Dsonar.python.version="3.13"
+                    -D sonar.projectKey="my1stscan" `
+                    -D sonar.sources="." `
+                    -D sonar.python.version="3.13"
                     '''
                 }
             }
