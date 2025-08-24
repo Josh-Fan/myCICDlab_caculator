@@ -48,8 +48,8 @@ pipeline {
                     if (Test-Path $activateScript) {
                         & $activateScript
                         pip install bandit safety
-                        bandit -r . -f json -o bandit_report.json
-                        safety check
+                        bandit -r .  --disable-parser -f json -o bandit_report.json
+                        safety scan --output text
                     } else {
                         Write-Error "Activation script not found at $activateScript"
                         exit 1
