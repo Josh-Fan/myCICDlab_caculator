@@ -20,6 +20,7 @@ pipeline {
                     if (Test-Path $activateScript) {
                         & $activateScript
                         pip install -r requirements.txt
+                        python.exe -m pip install --upgrade pip
                     } else {
                         Write-Error "Activation script not found at $activateScript"
                         exit 1
